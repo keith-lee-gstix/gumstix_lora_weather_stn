@@ -1,0 +1,2 @@
+const char *appEui = "ttn-application-eui-here";
+const char *appKey = "ttn-application-key-here";
