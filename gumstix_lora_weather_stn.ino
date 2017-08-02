@@ -41,8 +41,8 @@ void sleep_x_mins(int mins)
   while(wdt_count < mins * 15)
   {
     Serial.flush();
-    // LowPower.idle(SLEEP_4S, ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-    LowPower.powerStandby(SLEEP_4S, ADC_OFF, BOD_OFF);
+    LowPower.idle(SLEEP_4S, ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART1_ON, TWI_OFF, USB_OFF);
+    // LowPower.powerStandby(SLEEP_4S, ADC_OFF, BOD_OFF);
     wdt_count++;
   }
   Serial.println("Wakeup");
@@ -92,10 +92,12 @@ void setup() {
   // setup Lora
   loraSerial.begin(57600);
   debugSerial.println("-- STATUS");
-  ttn.showStatus();
+
 
   debugSerial.println("-- JOIN");
   ttn.join(appEui, appKey);
+  delay(500);
+  ttn.showStatus();
 }
 
 void loop() {
@@ -127,7 +129,7 @@ void loop() {
   lpp.addTemperature(1, ms5611_temp);
   
   // send packet
-  if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize(), 1, true, 0) == TTN_SUCCESSFUL_TRANSMISSION)
+  if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize()) == TTN_SUCCESSFUL_TRANSMISSION)
   {
     digitalWrite(LED_BUILTIN,HIGH);
     delay(100);
@@ -143,7 +145,7 @@ void loop() {
   // reset lpp, add data
   lpp.reset();
   lpp.addBarometricPressure(2, ms5611_pres);
-  if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize(), 2, true, 0) == TTN_SUCCESSFUL_TRANSMISSION)
+  if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize()) == TTN_SUCCESSFUL_TRANSMISSION)
   {
     digitalWrite(LED_BUILTIN,HIGH);
     delay(100);
@@ -159,7 +161,7 @@ void loop() {
     // reset lpp, add data
   lpp.reset();
   lpp.addAnalogInput(4, humi);
-  if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize(), 3, true, 0) == TTN_SUCCESSFUL_TRANSMISSION)
+  if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize()) == TTN_SUCCESSFUL_TRANSMISSION)
   {
     digitalWrite(LED_BUILTIN,HIGH);
     delay(100);
@@ -170,5 +172,7 @@ void loop() {
     digitalWrite(LED_BUILTIN,LOW);
   }
   
+  
   sleep_x_mins(5);
+  
 }
