@@ -16,8 +16,8 @@ struct WeatherPacket {
   int32_t tmp_temp;
 };
 
-extern const char *appEui;
-extern const char *appKey;
+extern const char appEui[];
+extern const char appKey[];
 #define loraSerial Serial1
 #define debugSerial Serial
 #define freqPlan TTN_FP_US915
@@ -92,12 +92,21 @@ void setup() {
   // setup Lora
   loraSerial.begin(57600);
   debugSerial.println("-- STATUS");
-
+  
 
   debugSerial.println("-- JOIN");
-  ttn.join(appEui, appKey);
+  
   delay(500);
-  ttn.showStatus();
+  if(sizeof(appEui) <= 5 || sizeof(appKey) <= 5){
+    while(!Serial);
+    Serial.println("Device not configured with Application EUI and key.\nUse the device ID below to register your device on TheThingsNetwork.org");
+    Serial.println(appEui);
+    Serial.println(appKey);
+    ttn.showStatus();
+    while(1);
+  }
+  ttn.join(appEui, appKey);
+  
 }
 
 void loop() {
