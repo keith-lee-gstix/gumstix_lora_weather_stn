@@ -169,7 +169,7 @@ void loop() {
 
     // reset lpp, add data
   lpp.reset();
-  lpp.addAnalogInput(4, humi);
+  lpp.addRelativeHumidity(4, humi);
   if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize()) == TTN_SUCCESSFUL_TRANSMISSION)
   {
     digitalWrite(LED_BUILTIN,HIGH);
